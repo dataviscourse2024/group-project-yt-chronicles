@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Chronicles</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>YT Chronicles</h1>
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="dark-mode-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    <main id="visualization-container">
+        <section class="visualization" id="map-visualization">
+            <h2>World Map</h2>
+            <div class="chart" id="map"></div>
+            <p id="selected-country-text">Selected country: <span id="selected-country-name">None</span></p>
+            <button id="reset-selection">Reset Selection</button>
+        </section>
+    
+        <section class="visualization" id="linechart-visualization">
+            <h2>Line Chart</h2>
+            <label for="metric-select">Select Metric:</label>
+            <select id="metric-select">
+                <option value="views">Views</option>
+                <option value="subscribers">Subscribers</option>
+                <option value="earnings">Earnings</option>
+            </select>
+            <div class="chart" id="linechart"></div>
+        </section>
+        
+
+    </main>
+    
+    <footer>
+        Created with ❤️ by Vijay and Kalyan
+    </footer>
+</body>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="script.js"></script>
+</html>
