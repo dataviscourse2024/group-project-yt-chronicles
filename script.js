@@ -18,9 +18,9 @@ const projection = d3.geoMercator().scale(130).translate([width / 2, height / 1.
 const path = d3.geoPath().projection(projection);
 
 // Define colors
-const defaultColor = "#FF0000";  // Default country color
+const defaultColor = "#FF0000";  // Default country color "#FFAAAA"
 const outlineColor = "#000000";  // Country border color
-const selectedColor = "#FFFFFF"; // Highlight color for selected country
+const selectedColor = "#FFFFFF"; // Highlight color for selected country "#FFFFFF"
 
 // Initialize variables for YouTube data and country selection
 let youtubeData = [];
@@ -64,9 +64,11 @@ d3.csv("data/data.csv").then(function(data) {
         views: +d['video views'],
         subscribers: +d.subscribers,
         earnings: +d['highest_yearly_earnings'],
-        country: d.Country
+        country: d.Country,
+        category:d.category
     }));
     updateLineChart("views");
+    renderMatrixMap();  
 });
 
 // Update the line chart based on selected metric and country
@@ -133,6 +135,7 @@ function updateLineChart(metric) {
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d[metric]))
         .attr("fill", defaultColor); 
+
 }
 
 // Update chart when dropdown selection changes
@@ -140,3 +143,87 @@ document.getElementById("metric-select").addEventListener("change", function() {
     const selectedMetric = this.value;
     updateLineChart(selectedMetric);
 });
+
+function renderMatrixMap() {
+    const matrixMap = d3.select("#matrix-map");
+    matrixMap.selectAll("*").remove(); 
+
+    const margin = { top: 40, right: 20, bottom: 100, left: 120 },
+          width = 800 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
+
+   
+    const categoryCountryCounts = d3.rollup(
+        youtubeData,
+        v => v.length,
+        d => d.category,
+        d => d.country
+    );
+
+    // Get the top 10 categories by count
+    const topCategories = Array.from(d3.rollup(
+        youtubeData,
+        v => v.length,
+        d => d.category
+    ))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(d => d[0]);
+
+   
+    const countries = Array.from(new Set(
+        youtubeData.filter(d => topCategories.includes(d.category)).map(d => d.country)
+    ));
+
+    const x = d3.scaleBand()
+        .domain(countries)
+        .range([0, width])
+        .padding(0.05);
+
+    const y = d3.scaleBand()
+        .domain(topCategories)
+        .range([0, height])
+        .padding(0.05);
+
+    const colorScale = d3.scaleSequential()
+        .domain([0, d3.max(Array.from(categoryCountryCounts.values(), d =>
+            d3.max(Array.from(d.values()))))])
+        .interpolator(d3.interpolateReds);
+
+    const svg = matrixMap.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+   
+    svg.selectAll()
+        .data(topCategories.flatMap(category =>
+            countries.map(country => ({
+                category: category,
+                country: country,
+                value: categoryCountryCounts.get(category)?.get(country) || 0
+            }))
+        ))
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d.country))
+        .attr("y", d => y(d.category))
+        .attr("width", x.bandwidth())
+        .attr("height", y.bandwidth())
+        .attr("fill", d => colorScale(d.value))
+        .append("title")
+        .text(d => `${d.category}, ${d.country}: ${d.value}`);
+
+    
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "rotate(-45)")
+        .style("text-anchor", "end");
+
+    svg.append("g")
+        .call(d3.axisLeft(y));
+}
+

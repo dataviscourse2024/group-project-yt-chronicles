@@ -9,12 +9,19 @@
 <body>
     <header>
         <h1>YT Chronicles</h1>
-        <div class="toggle-container">
-            <label class="switch">
-                <input type="checkbox" id="dark-mode-toggle">
-                <span class="slider"></span>
-            </label>
+        <div class="controls">
+            <a href="https://youtu.be/bPcibP4kwIE" target="_blank" id="youtube-link">
+                <img src="youtube-icon.png" alt="YouTube" class="icon">
+            </a>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
+
+
     </header>
     <main id="visualization-container">
         <section class="visualization" id="map-visualization">
@@ -25,7 +32,7 @@
         </section>
     
         <section class="visualization" id="linechart-visualization">
-            <h2>Line Chart</h2>
+            <h2>Bar Chart</h2>
             <label for="metric-select">Select Metric:</label>
             <select id="metric-select">
                 <option value="views">Views</option>
@@ -34,6 +41,12 @@
             </select>
             <div class="chart" id="linechart"></div>
         </section>
+
+        <section class="visualization" id="matrix-map-visualization">
+            <h2>Matrix Map of YouTube Category Popularity</h2>
+            <div class="chart" id="matrix-map"></div>
+        </section>
+        
         
 
     </main>

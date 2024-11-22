@@ -41,6 +41,7 @@ header {
     color: #fff;
 }
 
+
 header h1 {
     font-size: 2rem;
     margin-left: 1rem;
@@ -181,4 +182,29 @@ svg {
 
 #reset-selection:hover {
     background-color: darkred;  
+}
+
+#heatmap {
+    margin-top: 20px;
+}
+
+
+#youtube-link {
+    display: inline-block;
+    text-decoration: none;
+}
+#youtube-link .icon {
+    width: 30px;
+    height: 30px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
 }
