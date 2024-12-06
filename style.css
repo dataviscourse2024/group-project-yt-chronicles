@@ -1,4 +1,4 @@
-/* Reset styles */
+
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +6,7 @@
     font-family: Arial, sans-serif;
 }
 
-/* Light and dark mode variables */
+
 :root {
     --primary-color: #FF0000;
     --bg-color: #f9f9f9;
@@ -30,7 +30,7 @@ body {
     align-items: center;
 }
 
-/* Header styling */
+
 header {
     width: 100%;
     background-color: var(--primary-color);
@@ -41,13 +41,12 @@ header {
     color: #fff;
 }
 
-
 header h1 {
     font-size: 2rem;
     margin-left: 1rem;
 }
 
-/* Dark mode toggle styling */
+
 .toggle-container {
     margin-right: 1rem;
 }
@@ -99,7 +98,7 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 
-/* Main container */
+
 main#visualization-container {
     width: 90%;
     max-width: 1200px;
@@ -109,7 +108,7 @@ main#visualization-container {
     gap: 2rem;
 }
 
-/* Section styling for each visualization */
+
 .visualization {
     background-color: var(--card-bg);
     padding: 1.5rem;
@@ -131,13 +130,13 @@ main#visualization-container {
     border-radius: 4px;
 }
 
-/* Footer styling */
+
 footer {
     width: 100%;
     padding: 1rem;
     text-align: center;
     color: #fff;
-    background-color: var(--primary-color); /* Red background */
+    background-color: var(--primary-color); 
     margin-top: 2rem;
 }
 
@@ -149,7 +148,7 @@ footer {
 }
 
 #selected-country-name {
-    color: var(--primary-color); /* Red color for country name */
+    color: var(--primary-color); 
     font-weight: bold;
 }
 
@@ -166,13 +165,20 @@ svg {
     width: auto;   
     height: auto;  
 }
-
+#youtube-link {
+    display: inline-block;
+    text-decoration: none;
+}
+#youtube-link .icon {
+    width: 50px;
+    height: 30px;
+}
 
 #reset-selection {
     display: block;
     margin: 1rem auto;
     padding: 0.5rem 1rem;
-    background-color: var(--primary-color); /* Red background */
+    background-color: var(--primary-color); 
     color: white;
     border: none;
     border-radius: 4px;
@@ -184,27 +190,63 @@ svg {
     background-color: darkred;  
 }
 
-#heatmap {
-    margin-top: 20px;
-}
 
-
-#youtube-link {
-    display: inline-block;
-    text-decoration: none;
-}
-#youtube-link .icon {
-    width: 30px;
-    height: 30px;
-}
-
-.controls {
+#chart-stats-container {
     display: flex;
-    align-items: center;
-    gap: 10px; 
+    gap: 2rem; 
+    justify-content: center;
+    margin-top: 2rem;
 }
 
-.toggle-container {
-    display: flex;
-    align-items: center;
+
+#chart-stats-container .visualization {
+    flex: 1;
 }
+
+
+#youtuber-stats {
+    height: 400px; 
+    overflow-y: scroll; 
+    overflow-x: auto; 
+    border: 1px solid #ccc; 
+    margin-top: 1rem;
+    position: relative; 
+}
+
+
+.stats-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+.stats-table th, .stats-table td {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.stats-table th {
+    background-color: #FF0000; 
+    color: #fff; 
+    position: sticky; 
+    top: 0;
+    z-index: 2;
+}
+
+.stats-table tr:nth-child(even) {
+    background-color: #f9f9f9; 
+}
+
+
+
+
+body.dark-mode .stats-table td {
+    color: #fff; 
+    background-color: #444; 
+}
+
+body.dark-mode .stats-table tr:nth-child(even) {
+    background-color: #555; 
+}
+

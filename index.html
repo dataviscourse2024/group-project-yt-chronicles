@@ -30,9 +30,10 @@
             <p id="selected-country-text">Selected country: <span id="selected-country-name">None</span></p>
             <button id="reset-selection">Reset Selection</button>
         </section>
-    
+
+        <div id="chart-stats-container">
         <section class="visualization" id="linechart-visualization">
-            <h2>Bar Chart</h2>
+            <h2>Top Five Youtubers</h2>
             <label for="metric-select">Select Metric:</label>
             <select id="metric-select">
                 <option value="views">Views</option>
@@ -42,11 +43,23 @@
             <div class="chart" id="linechart"></div>
         </section>
 
+        <section class="visualization" id="stats-visualization">
+            <h2>Youtuber Stats</h2>
+            <div class="chart" id="youtuber-stats"></div>
+        </section>
+    </div>
+    <div id="matrix-bubble-container">
+        <section class="visualization" id="bubble-visualizations">
+            <h2>Bubble Chart showing trends</h2>
+            <div class="chart" id="bubble-chart"></div>
+        </section>
+
         <section class="visualization" id="matrix-map-visualization">
             <h2>Matrix Map of YouTube Category Popularity</h2>
             <div class="chart" id="matrix-map"></div>
         </section>
-        
+
+    </div>
         
 
     </main>
