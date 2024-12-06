@@ -5,7 +5,7 @@
 **YT Chronicles** is a web-based visualization tool that provides insights into YouTube statistics globally. The project presents dynamic visualizations to explore trends in video views, subscriber counts, and earnings for YouTubers, organized by countries and categories.
 
 ## Project Links
-- **Website:** [YT Chronicles]
+- **Website:** [YT Chronicles](https://dataviscourse2024.github.io/group-project-yt-chronicles/)
 - **Demo Video:** [Screencast on YouTube](https://youtu.be/bPcibP4kwIE)
 
 The project contains index.html,style.css and script.js which are the code sections. The processed data is data\data.csv.
