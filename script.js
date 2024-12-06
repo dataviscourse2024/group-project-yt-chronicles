@@ -1,9 +1,3 @@
-
-document.getElementById("dark-mode-toggle").addEventListener("change", function () {
-    document.body.classList.toggle("dark-mode");
-});
-
-
 const width = 800;
 const height = 500;
 
@@ -75,22 +69,20 @@ d3.csv("data/data.csv").then(function(data) {
 });
 
 
+
 function updateLineChart(metric) {
     const linechart = d3.select("#linechart");
-    linechart.selectAll("*").remove(); 
-
+    linechart.selectAll("*").remove();
 
     const filteredData = selectedCountry
         ? youtubeData.filter(d => d.country === selectedCountry)
         : youtubeData;
 
-
     const top5 = filteredData.sort((a, b) => b[metric] - a[metric]).slice(0, 5);
 
-    const margin = {top: 20, right: 20, bottom: 30, left: 40},
+    const margin = { top: 20, right: 20, bottom: 50, left: 70 },
           width = 800 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
-
 
     const x = d3.scaleBand()
         .domain(top5.map(d => d.title))
@@ -102,43 +94,91 @@ function updateLineChart(metric) {
         .nice()
         .range([height, 0]);
 
-
     const svg = linechart.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-    svg.append("g")
+    const xAxisGroup = svg.append("g")
         .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
+        .attr("transform", `translate(0,${height})`);
 
+    const yAxisGroup = svg.append("g")
+        .attr("class", "axis axis--y");
 
-    const formatY = (d) => {
-        if (d >= 1e9) return (d / 1e9).toFixed(1).replace(/\.0$/, '') + 'B'; // Billions
-        if (d >= 1e6) return (d / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'; // Millions
-        if (d >= 1e3) return (d / 1e3).toFixed(1).replace(/\.0$/, '') + 'K'; // Thousands
-        return d.toString(); 
-    };
+    const xAxis = d3.axisBottom(x);
+    const yAxis = d3.axisLeft(y).tickFormat(d => {
+        if (d >= 1e9) return (d / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+        if (d >= 1e6) return (d / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (d >= 1e3) return (d / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+        return d.toString();
+    });
 
+    xAxisGroup.call(xAxis);
+    yAxisGroup.call(yAxis);
 
-    svg.append("g")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).tickFormat(formatY)); 
+    svg.append("text")
+        .attr("class", "x-axis-label")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom - 10)
+        .text("Youtube Channels"); 
 
+    svg.append("text")
+        .attr("class", "y-axis-label")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -margin.left + 20)
+        .text(metric.charAt(0).toUpperCase() + metric.slice(1)); 
 
-    svg.selectAll(".bar")
-        .data(top5)
-        .enter().append("rect")
+    const bars = svg.selectAll(".bar")
+        .data(top5, d => d.title);
+
+    bars.enter()
+        .append("rect")
         .attr("class", "bar")
+        .attr("x", d => x(d.title))
+        .attr("y", height)
+        .attr("width", x.bandwidth())
+        .attr("height", 0)
+        .attr("fill", defaultColor)
+        .transition()
+        .duration(1000)
+        .attr("y", d => y(d[metric]))
+        .attr("height", d => height - y(d[metric]));
+
+    bars.transition()
+        .duration(1000)
         .attr("x", d => x(d.title))
         .attr("y", d => y(d[metric]))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d[metric]))
-        .attr("fill", defaultColor); 
+        .attr("fill", defaultColor);
+
+    bars.exit()
+        .transition()
+        .duration(1000)
+        .attr("y", height)
+        .attr("height", 0)
+        .remove();
+
+    xAxisGroup.transition()
+        .duration(1000)
+        .call(xAxis);
+
+    yAxisGroup.transition()
+        .duration(1000)
+        .call(yAxis);
 }
+
+document.getElementById("metric-select").addEventListener("change", function() {
+    const selectedMetric = this.value;
+    updateLineChart(selectedMetric);
+});
+
+
 
 
 document.getElementById("metric-select").addEventListener("change", function() {
@@ -221,85 +261,6 @@ function createYoutuberStatsTable() {
     });
 }
 
-
-// function createYoutuberStatsTable() {
-//     const container = d3.select("#youtuber-stats");
-
-
-//     const table = container.append("table").attr("class", "stats-table");
-//     const thead = table.append("thead");
-//     const tbody = table.append("tbody");
-
-
-//     const columns = ["Rank", "Title", "Subscribers", "Video Views"];
-
-
-//     thead.append("tr")
-//         .selectAll("th")
-//         .data(columns)
-//         .enter()
-//         .append("th")
-//         .text(d => d);
-
-
-//     function updateTable(data) {
-//         const top10 = data.slice(0, 10);
-
-//         tbody.selectAll("tr").remove();
-
-//         const rows = tbody.selectAll("tr")
-//             .data(top10)
-//             .enter()
-//             .append("tr");
-
-//         rows.selectAll("td")
-//             .data(d => [d.rank, d.Title, d.subscribers, d["video views"]])
-//             .enter()
-//             .append("td")
-//             .text(d => d);
-
-//         const containerElement = document.getElementById("youtuber-stats");
-//         containerElement.scrollTop = 0; 
-//     }
-
-//     // Load the CSV data
-//     d3.csv("data/data.csv").then(data => {
-//         // Parse numerical data
-//         data.forEach(d => {
-//             d.rank = +d.rank;
-//             d.subscribers = d3.format(",")(+d.subscribers); 
-//             d["video views"] = d3.format(",")(+d["video views"]); 
-//         });
-
-//         // Set default display for the top 10 YouTubers
-//         const top10 = data.sort((a, b) => a.rank - b.rank).slice(0, 10);
-//         updateTable(top10);
-
-   
-//         d3.select("#selected-country-name").on("DOMSubtreeModified", function () {
-//             const selectedCountry = d3.select("#selected-country-name").text();
-
-//             if (selectedCountry === "None") {
-//                 updateTable(top10);
-//             } else {
-//                 const filteredData = data
-//                     .filter(d => d.Country === selectedCountry)
-//                     .sort((a, b) => a.rank - b.rank)
-//                     .slice(0, 10);
-
-//                 if (filteredData.length === 0) {
-//                     tbody.selectAll("tr").remove();
-//                     tbody.append("tr").append("td")
-//                         .attr("colspan", columns.length)
-//                         .text("No data available for the selected country.")
-//                         .style("text-align", "center");
-//                 } else {
-//                     updateTable(filteredData);
-//                 }
-//             }
-//         });
-//     });
-// }
 
 createYoutuberStatsTable();
 
@@ -393,12 +354,9 @@ function renderMatrixMap() {
        
 
 
-
-
-
 function renderBubbleChart() {
     const bubbleChartDiv = document.getElementById("bubble-chart");
-    bubbleChartDiv.innerHTML = ""; // Clear the existing chart
+    bubbleChartDiv.innerHTML = "";
 
     const selectedMetric = document.getElementById("metric-select").value;
 
@@ -423,7 +381,7 @@ function renderBubbleChart() {
     const yDomain = d3.extent(filteredData, d => d[yMetric]);
 
     const x = d3.scaleLog()
-        .domain([xDomain[0] * 0.9, xDomain[1] * 1.1]) 
+        .domain([xDomain[0] * 0.9, xDomain[1] * 1.1])
         .range([0, width])
         .clamp(true);
 
@@ -436,30 +394,28 @@ function renderBubbleChart() {
         .domain([0, d3.max(filteredData, d => d[sizeMetric])])
         .range([5, 50]);
 
-
     const colorScale = d3.scaleOrdinal()
-        .domain([...new Set(filteredData.map(d => d.category))]) 
+        .domain([...new Set(filteredData.map(d => d.category))])
         .range(d3.schemeCategory10);
-
 
     const xAxis = d3.axisBottom(x).ticks(10, "~s");
     const yAxis = d3.axisLeft(y).tickFormat(d => {
-        if (d >= 1e6) return `${d / 1e6}M`; 
-        if (d >= 1e3) return `${d / 1e3}K`; 
+        if (d >= 1e6) return `${d / 1e6}M`;
+        if (d >= 1e3) return `${d / 1e3}K`;
         return d;
     });
 
     svg.append("g")
         .attr("class", "x-axis")
-        .attr("transform", `translate(0,${height})`) 
+        .attr("transform", `translate(0,${height})`)
         .call(xAxis);
 
     svg.append("text")
         .attr("class", "x-axis-label")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
-        .attr("y", height + margin.bottom - 10) 
-        .text(xMetric.charAt(0).toUpperCase() + xMetric.slice(1)); 
+        .attr("y", height + margin.bottom - 10)
+        .text(xMetric.charAt(0).toUpperCase() + xMetric.slice(1));
 
     svg.append("g")
         .attr("class", "y-axis")
@@ -470,8 +426,8 @@ function renderBubbleChart() {
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", -margin.left + 20) 
-        .text(yMetric.charAt(0).toUpperCase() + yMetric.slice(1)); 
+        .attr("y", -margin.left + 20)
+        .text(yMetric.charAt(0).toUpperCase() + yMetric.slice(1));
 
     const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
@@ -482,40 +438,57 @@ function renderBubbleChart() {
         .style("border", "1px solid #ccc")
         .style("border-radius", "5px");
 
+    const bubbles = svg.selectAll(".bubble")
+        .data(filteredData, d => d.title);
 
-    svg.selectAll(".bubble")
-    .data(filteredData)
-    .enter()
-    .append("circle")
-    .attr("class", "bubble")
-    .attr("cx", d => x(d[xMetric]))
-    .attr("cy", d => y(d[yMetric]))
-    .attr("r", d => sizeScale(d[sizeMetric]))
-    .attr("fill", d => colorScale(d.category)) 
-    .attr("opacity", 0.7)
-    .on("mouseover", function (event, d) {
-        tooltip.html(`
-            <strong>Youtuber: ${d.title}</strong><br>
-            Country: ${d.country}<br>
-            Views: ${d.views.toLocaleString()}<br>
-            Subscribers: ${d.subscribers.toLocaleString()}<br>
-            Earnings: $${d.earnings.toLocaleString()}
-        `)
-        .style("visibility", "visible")
-        .style("top", `${event.pageY + 10}px`)
-        .style("left", `${event.pageX + 10}px`);
-        d3.select(this).attr("stroke", "black").attr("stroke-width", 2);
-    })
-    .on("mousemove", function (event) {
-        tooltip.style("top", `${event.pageY + 10}px`)
+    bubbles.enter()
+        .append("circle")
+        .attr("class", "bubble")
+        .attr("cx", d => x(d[xMetric]))
+        .attr("cy", d => y(d[yMetric]))
+        .attr("r", 0)
+        .attr("fill", d => colorScale(d.category))
+        .attr("opacity", 0)
+        .on("mouseover", function (event, d) {
+            tooltip.html(`
+                <strong>Youtuber: ${d.title}</strong><br>
+                Country: ${d.country}<br>
+                Views: ${d.views.toLocaleString()}<br>
+                Subscribers: ${d.subscribers.toLocaleString()}<br>
+                Earnings: $${d.earnings.toLocaleString()}
+            `)
+            .style("visibility", "visible")
+            .style("top", `${event.pageY + 10}px`)
             .style("left", `${event.pageX + 10}px`);
-    })
-    .on("mouseout", function () {
-        tooltip.style("visibility", "hidden");
-        d3.select(this).attr("stroke", null);
-    });
-}
+            d3.select(this).attr("stroke", "black").attr("stroke-width", 2);
+        })
+        .on("mousemove", function (event) {
+            tooltip.style("top", `${event.pageY + 10}px`)
+                .style("left", `${event.pageX + 10}px`);
+        })
+        .on("mouseout", function () {
+            tooltip.style("visibility", "hidden");
+            d3.select(this).attr("stroke", null);
+        })
+        .transition()
+        .duration(1000)
+        .attr("r", d => sizeScale(d[sizeMetric]))
+        .attr("opacity", 0.7);
 
+    bubbles.transition()
+        .duration(1000)
+        .attr("cx", d => x(d[xMetric]))
+        .attr("cy", d => y(d[yMetric]))
+        .attr("r", d => sizeScale(d[sizeMetric]))
+        .attr("opacity", 0.7);
+
+    bubbles.exit()
+        .transition()
+        .duration(1000)
+        .attr("r", 0)
+        .attr("opacity", 0)
+        .remove();
+}
 
 
 document.getElementById("metric-select").addEventListener("change", renderBubbleChart);
