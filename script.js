@@ -146,18 +146,14 @@ document.getElementById("metric-select").addEventListener("change", function() {
     updateLineChart(selectedMetric);
 });
 
-
 function createYoutuberStatsTable() {
     const container = d3.select("#youtuber-stats");
-
 
     const table = container.append("table").attr("class", "stats-table");
     const thead = table.append("thead");
     const tbody = table.append("tbody");
 
-
     const columns = ["Rank", "Title", "Subscribers", "Video Views"];
-
 
     thead.append("tr")
         .selectAll("th")
@@ -165,7 +161,6 @@ function createYoutuberStatsTable() {
         .enter()
         .append("th")
         .text(d => d);
-
 
     function updateTable(data) {
         const top10 = data.slice(0, 10);
@@ -184,24 +179,22 @@ function createYoutuberStatsTable() {
             .text(d => d);
 
         const containerElement = document.getElementById("youtuber-stats");
-        containerElement.scrollTop = 0; 
+        containerElement.scrollTop = 0;
     }
 
-    // Load the CSV data
     d3.csv("data/data.csv").then(data => {
-        // Parse numerical data
         data.forEach(d => {
             d.rank = +d.rank;
-            d.subscribers = d3.format(",")(+d.subscribers); 
-            d["video views"] = d3.format(",")(+d["video views"]); 
+            d.subscribers = d3.format(",")(+d.subscribers);
+            d["video views"] = d3.format(",")(+d["video views"]);
         });
 
-        // Set default display for the top 10 YouTubers
         const top10 = data.sort((a, b) => a.rank - b.rank).slice(0, 10);
         updateTable(top10);
 
-   
-        d3.select("#selected-country-name").on("DOMSubtreeModified", function () {
+        const targetNode = document.getElementById("selected-country-name");
+
+        const observer = new MutationObserver(() => {
             const selectedCountry = d3.select("#selected-country-name").text();
 
             if (selectedCountry === "None") {
@@ -223,8 +216,90 @@ function createYoutuberStatsTable() {
                 }
             }
         });
+
+        observer.observe(targetNode, { childList: true });
     });
 }
+
+
+// function createYoutuberStatsTable() {
+//     const container = d3.select("#youtuber-stats");
+
+
+//     const table = container.append("table").attr("class", "stats-table");
+//     const thead = table.append("thead");
+//     const tbody = table.append("tbody");
+
+
+//     const columns = ["Rank", "Title", "Subscribers", "Video Views"];
+
+
+//     thead.append("tr")
+//         .selectAll("th")
+//         .data(columns)
+//         .enter()
+//         .append("th")
+//         .text(d => d);
+
+
+//     function updateTable(data) {
+//         const top10 = data.slice(0, 10);
+
+//         tbody.selectAll("tr").remove();
+
+//         const rows = tbody.selectAll("tr")
+//             .data(top10)
+//             .enter()
+//             .append("tr");
+
+//         rows.selectAll("td")
+//             .data(d => [d.rank, d.Title, d.subscribers, d["video views"]])
+//             .enter()
+//             .append("td")
+//             .text(d => d);
+
+//         const containerElement = document.getElementById("youtuber-stats");
+//         containerElement.scrollTop = 0; 
+//     }
+
+//     // Load the CSV data
+//     d3.csv("data/data.csv").then(data => {
+//         // Parse numerical data
+//         data.forEach(d => {
+//             d.rank = +d.rank;
+//             d.subscribers = d3.format(",")(+d.subscribers); 
+//             d["video views"] = d3.format(",")(+d["video views"]); 
+//         });
+
+//         // Set default display for the top 10 YouTubers
+//         const top10 = data.sort((a, b) => a.rank - b.rank).slice(0, 10);
+//         updateTable(top10);
+
+   
+//         d3.select("#selected-country-name").on("DOMSubtreeModified", function () {
+//             const selectedCountry = d3.select("#selected-country-name").text();
+
+//             if (selectedCountry === "None") {
+//                 updateTable(top10);
+//             } else {
+//                 const filteredData = data
+//                     .filter(d => d.Country === selectedCountry)
+//                     .sort((a, b) => a.rank - b.rank)
+//                     .slice(0, 10);
+
+//                 if (filteredData.length === 0) {
+//                     tbody.selectAll("tr").remove();
+//                     tbody.append("tr").append("td")
+//                         .attr("colspan", columns.length)
+//                         .text("No data available for the selected country.")
+//                         .style("text-align", "center");
+//                 } else {
+//                     updateTable(filteredData);
+//                 }
+//             }
+//         });
+//     });
+// }
 
 createYoutuberStatsTable();
 
